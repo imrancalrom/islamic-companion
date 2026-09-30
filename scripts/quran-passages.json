@@ -1,0 +1,19 @@
+{
+  "_comment": "Quran passages the app shows. Each part is one ayah; fromWord (0-based) starts part-way through an ayah. Run `npm run quran:import` after editing.",
+  "passages": {
+    "ayat-al-kursi": [{ "surah": 2, "ayah": 255 }],
+    "al-ikhlas": [
+      { "surah": 112, "ayah": 1 }, { "surah": 112, "ayah": 2 }, { "surah": 112, "ayah": 3 }, { "surah": 112, "ayah": 4 }
+    ],
+    "al-falaq": [
+      { "surah": 113, "ayah": 1 }, { "surah": 113, "ayah": 2 }, { "surah": 113, "ayah": 3 }, { "surah": 113, "ayah": 4 }, { "surah": 113, "ayah": 5 }
+    ],
+    "an-nas": [
+      { "surah": 114, "ayah": 1 }, { "surah": 114, "ayah": 2 }, { "surah": 114, "ayah": 3 },
+      { "surah": 114, "ayah": 4 }, { "surah": 114, "ayah": 5 }, { "surah": 114, "ayah": 6 }
+    ],
+    "baqarah-285-286": [{ "surah": 2, "ayah": 285 }, { "surah": 2, "ayah": 286 }],
+    "yunus": [{ "surah": 21, "ayah": 87, "fromWord": 14 }],
+    "riding": [{ "surah": 43, "ayah": 13, "fromWord": 11 }, { "surah": 43, "ayah": 14 }]
+  }
+}
