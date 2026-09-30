@@ -71,7 +71,7 @@ export default function SettingsScreen() {
           </View>
           <Switch value={settings.adhkarReminders} onValueChange={(v) => update({ adhkarReminders: v })} trackColor={{ true: colors.ink }} />
         </View>
-        <Text style={s.detail}>Turn each prayer's reminder on or off with the bell on the Prayer screen.</Text>
+        <Text style={s.detail}>Turn each prayer{"'"}s reminder on or off with the bell on the Prayer screen.</Text>
         <Button label="Refresh reminders" variant="outline" icon="refresh" onPress={refresh} />
       </Card>
 
@@ -79,7 +79,7 @@ export default function SettingsScreen() {
 
       <Text style={s.footnote}>
         Prayer times are calculated on your phone and may differ by a few minutes from your local mosque. Adjust the
-        method to match. All Quran and hadith text shows its source; items marked "pending scholar review" have not yet
+        method to match. All Quran and hadith text shows its source; items marked “pending scholar review” have not yet
         been checked. Quran text: Tanzil Project (tanzil.net), Uthmani text v1.1, CC BY 3.0, used verbatim.
       </Text>
     </ScrollView>

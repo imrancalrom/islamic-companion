@@ -35,6 +35,12 @@ npm run quran:check   # Quran text still matches Tanzil
 npx expo-doctor       # dependency and config check
 ```
 
+## Download the Android APK
+
+Every push to `main` builds an APK on GitHub Actions (`.github/workflows/android-apk.yml`) and attaches it to a new pre-release on the repository's **Releases** page. You can also start a build from **Actions → Android APK → Run workflow**.
+
+To install: open the release on your Android phone, download the `.apk`, open it and allow "Install unknown apps" when asked. The APK is signed with a debug key, which is fine for testing but not for Google Play; for the store, build a signed `.aab` with EAS.
+
 ## Before publishing to the stores
 
 1. **Scholar review of all content.** Every item in `src/data/adhkar.ts` and `src/data/duas.ts` is marked `reviewed: false`, and the app shows "pending scholar review" under it. Check the hadith Arabic word for word against the hadith book, and check every translation and grading. Set `reviewed: true` only after that.

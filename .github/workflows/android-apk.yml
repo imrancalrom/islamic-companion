@@ -1,0 +1,85 @@
+name: Android APK
+
+# Builds an installable Android APK on every push to main (or on demand from the
+# Actions tab) and attaches it to a GitHub Release so it can be downloaded.
+#
+# The APK is signed with the default debug key, which is fine for installing and
+# testing on your own phones. For Google Play, build a signed .aab with EAS instead
+# (see README).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      EXPO_NO_TELEMETRY: 1
+      CI: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check code and Quran text
+        run: |
+          npm run typecheck
+          npm run lint
+          npm run quran:check
+
+      - name: Generate the Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Build release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Name the APK
+        id: apk
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          NAME="islamic-companion-v${VERSION}-build${{ github.run_number }}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.name }}
+          path: ${{ steps.apk.outputs.name }}
+          retention-days: 30
+
+      - name: Publish as a GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-build-${{ github.run_number }}
+          name: Android APK ${{ steps.apk.outputs.version }} (build ${{ github.run_number }})
+          prerelease: true
+          files: ${{ steps.apk.outputs.name }}
+          body: |
+            Test build from commit ${{ github.sha }}.
+            Install on Android: download the .apk on the phone, open it, and allow "Install unknown apps" when asked.
+            Signed with a debug key, for testing only. Content is pending scholar review.

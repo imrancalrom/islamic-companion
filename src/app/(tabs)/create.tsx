@@ -1,6 +1,6 @@
 import * as Sharing from 'expo-sharing';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { PixelRatio, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, G, Rect } from 'react-native-svg';
@@ -34,7 +34,10 @@ const EXPORT_WIDTH = 1080;
 export default function CreateScreen() {
   const params = useLocalSearchParams<{ entry?: string }>();
   const { width: screenW } = useWindowDimensions();
-  const [entryId, setEntryId] = useState(params.entry ?? 'subhanallah-wa-bihamdihi');
+  // A choice made here wins until the screen is opened again with a different entry.
+  const [choice, setChoice] = useState<{ id: string; forParam?: string } | null>(null);
+  const entryId =
+    choice && choice.forParam === params.entry ? choice.id : (params.entry ?? choice?.id ?? 'subhanallah-wa-bihamdihi');
   const [size, setSize] = useState<(typeof SIZES)[number]['id']>('post');
   const [themeId, setThemeId] = useState<ThemeId>('green');
   const [showUrdu, setShowUrdu] = useState(true);
@@ -43,9 +46,6 @@ export default function CreateScreen() {
   const [status, setStatus] = useState<string | null>(null);
   const cardRef = useRef<View>(null);
 
-  useEffect(() => {
-    if (params.entry) setEntryId(params.entry);
-  }, [params.entry]);
 
   const entry = ALL.find((e) => e.id === entryId) ?? ALL[0];
   const t = THEMES[themeId];
@@ -61,13 +61,15 @@ export default function CreateScreen() {
   const len = entry.arabic.length + (showUrdu ? entry.urdu.length * 0.7 : 0) + (showEnglish ? entry.english.length * 0.5 : 0);
   const fit = Math.sqrt((120 * ratio) / Math.max(1, len));
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-  const [shrink, setShrink] = useState(1);
+  // The shrink factor belongs to one layout; any change of text, size or screen starts again at 1.
+  const layoutKey = `${entryId}|${size}|${showUrdu}|${showEnglish}|${screenW}`;
+  const [shrinkState, setShrinkState] = useState({ key: layoutKey, value: 1 });
+  const shrink = shrinkState.key === layoutKey ? shrinkState.value : 1;
   const [boxH, setBoxH] = useState(0);
-  useEffect(() => setShrink(1), [entryId, size, showUrdu, showEnglish, screenW]);
   const arabicSize = u * clamp(40 * fit * shrink, 9, 44);
   const bodySize = u * clamp(15 * fit * shrink, 6, 16);
   function onContentLayout(h: number) {
-    if (boxH > 0 && h > boxH && shrink > 0.3) setShrink((v) => v * 0.9);
+    if (boxH > 0 && h > boxH && shrink > 0.3) setShrinkState({ key: layoutKey, value: shrink * 0.9 });
   }
 
   async function share() {
@@ -157,7 +159,7 @@ export default function CreateScreen() {
               <Pressable
                 key={e.id}
                 onPress={() => {
-                  setEntryId(e.id);
+                  setChoice({ id: e.id, forParam: params.entry });
                   setPicking(false);
                 }}
                 style={[s.listItem, e.id === entryId && { backgroundColor: colors.highlight }]}
@@ -200,7 +202,7 @@ export default function CreateScreen() {
 
         <View style={s.note}>
           <Icon name="lock" size={16} color={colors.goldText} />
-          <Text style={s.noteText}>Text comes from the verified library and can't be edited.</Text>
+          <Text style={s.noteText}>Text comes from the verified library and can{"'"}t be edited.</Text>
         </View>
 
         {status ? <Text style={s.status}>{status}</Text> : null}
