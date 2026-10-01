@@ -18,6 +18,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="adhkar" options={{ title: 'Adhkar', tabBarIcon: ({ color }) => <Icon name="beads" color={color} /> }} />
       <Tabs.Screen name="duas" options={{ title: 'Duas', tabBarIcon: ({ color }) => <Icon name="book" color={color} /> }} />
       <Tabs.Screen name="create" options={{ title: 'Create', tabBarIcon: ({ color }) => <Icon name="image" color={color} /> }} />
+      <Tabs.Screen name="more" options={{ title: 'More', tabBarIcon: ({ color }) => <Icon name="grid" color={color} /> }} />
     </Tabs>
   );
 }

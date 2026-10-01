@@ -2,13 +2,22 @@ import { Link } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Icon } from '../../components/Icon';
+import { Icon, IconName } from '../../components/Icon';
 import { Button, Card } from '../../components/ui';
 import { adhkarFor } from '../../data/adhkar';
 import { detectPlace } from '../../lib/location';
-import { formatCountdown, formatTime, hijriDate, nextPrayer, timeRows } from '../../lib/prayer';
+import { nextFast } from '../../lib/fasting';
+import { isFriday } from '../../lib/friday';
+import { formatCountdown, formatTime, hijriDate, nextPrayer, sunnahTimes, timeRows } from '../../lib/prayer';
 import { dayKey, PrayerKey, useSettings } from '../../lib/settings';
+import { togglePrayer } from '../../lib/tracker';
 import { colors, fonts, radius } from '../../theme';
+
+const SHORTCUTS: { href: '/more/tasbeeh' | '/more/qibla' | '/more/tracker'; icon: IconName; label: string }[] = [
+  { href: '/more/tasbeeh', icon: 'beads', label: 'Tasbeeh' },
+  { href: '/more/qibla', icon: 'compass', label: 'Qibla' },
+  { href: '/more/tracker', icon: 'chart', label: 'Tracker' },
+];
 
 function useNow(intervalMs = 30000) {
   const [now, setNow] = useState(() => new Date());
@@ -45,6 +54,8 @@ export default function PrayerScreen() {
   const next = place ? nextPrayer(place, now, settings) : null;
   const prayed = settings.prayed[today] ?? [];
   const hijri = hijriDate(now);
+  const sunnah = place ? sunnahTimes(place, now, settings) : null;
+  const fast = nextFast(now);
 
   // Evening adhkar after Asr, morning before.
   const session = place && rows.length && now >= rows[3].time ? 'evening' : 'morning';
@@ -52,10 +63,7 @@ export default function PrayerScreen() {
   const sessionDone = (settings.adhkarDone[today] ?? []).includes(session);
 
   function togglePrayed(key: PrayerKey) {
-    const list = prayed.includes(key) ? prayed.filter((k) => k !== key) : [...prayed, key];
-    // Keep the last 60 days only.
-    const recent = Object.fromEntries(Object.entries(settings.prayed).sort().slice(-59));
-    update({ prayed: { ...recent, [today]: list } });
+    update({ prayed: togglePrayer(settings.prayed, today, key) });
   }
 
   function toggleNotify(key: PrayerKey) {
@@ -165,6 +173,56 @@ export default function PrayerScreen() {
                 <Icon name="chevronRight" size={18} color={colors.textMuted} />
               </Pressable>
             </Link>
+
+            {isFriday(now) ? (
+              <Link href="/more/friday" asChild>
+                <Pressable style={s.friday}>
+                  <Icon name="star" color={colors.onInk} />
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.fridayTitle}>Jumu’ah Mubarak</Text>
+                    <Text style={s.fridayBody}>Read Al-Kahf, send salawat, and make dua in the last hour before Maghrib.</Text>
+                  </View>
+                </Pressable>
+              </Link>
+            ) : null}
+
+            {sunnah ? (
+              <Card style={{ gap: 10 }}>
+                <View style={s.sunRow}>
+                  <Text style={s.sunLabel}>Duha</Text>
+                  <Text style={s.sunValue}>{formatTime(sunnah.duhaStart)} – {formatTime(sunnah.duhaEnd)}</Text>
+                </View>
+                <View style={s.sunRow}>
+                  <Text style={s.sunLabel}>Witr</Text>
+                  <Text style={s.sunValue}>After Isha until Fajr</Text>
+                </View>
+                <View style={s.sunRow}>
+                  <Text style={s.sunLabel}>Last third of the night</Text>
+                  <Text style={s.sunValue}>from {formatTime(sunnah.lastThird)}</Text>
+                </View>
+                {fast ? (
+                  <Link href="/more/fasting" asChild>
+                    <Pressable style={s.fastRow}>
+                      <Text style={s.sunLabel}>Next Sunnah fast</Text>
+                      <Text style={[s.sunValue, { color: colors.ink }]}>
+                        {fast.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })} · {fast.fasts[0].title}
+                      </Text>
+                    </Pressable>
+                  </Link>
+                ) : null}
+              </Card>
+            ) : null}
+
+            <View style={s.shortcuts}>
+              {SHORTCUTS.map((x) => (
+                <Link key={x.href} href={x.href} asChild>
+                  <Pressable style={s.shortcut}>
+                    <Icon name={x.icon} color={colors.goldText} />
+                    <Text style={s.shortcutText}>{x.label}</Text>
+                  </Pressable>
+                </Link>
+              ))}
+            </View>
           </>
         )}
       </ScrollView>
@@ -200,5 +258,15 @@ const s = StyleSheet.create({
   bold: { fontFamily: fonts.bold, color: colors.ink },
   bell: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   adhkarCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  friday: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: radius.lg, backgroundColor: colors.goldText },
+  fridayTitle: { fontFamily: fonts.bold, fontSize: 16, color: colors.onInk },
+  fridayBody: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18, color: colors.onInk },
+  sunRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
+  fastRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 10, minHeight: 44 },
+  sunLabel: { fontFamily: fonts.regular, fontSize: 14, color: colors.textMuted },
+  sunValue: { fontFamily: fonts.semibold, fontSize: 14, color: colors.text, flexShrink: 1, textAlign: 'right' },
+  shortcuts: { flexDirection: 'row', gap: 10 },
+  shortcut: { flex: 1, minHeight: 72, borderRadius: radius.lg, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  shortcutText: { fontFamily: fonts.semibold, fontSize: 13, color: colors.text },
   adhkarIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.highlight, alignItems: 'center', justifyContent: 'center' },
 });

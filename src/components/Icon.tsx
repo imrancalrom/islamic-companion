@@ -4,7 +4,7 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 export type IconName =
   | 'clock' | 'beads' | 'book' | 'image' | 'settings' | 'pin' | 'check' | 'bell' | 'bellOff'
   | 'chevronRight' | 'chevronLeft' | 'sun' | 'moon' | 'plane' | 'food' | 'heart' | 'plus'
-  | 'shield' | 'search' | 'share' | 'lock' | 'refresh';
+  | 'shield' | 'search' | 'share' | 'lock' | 'refresh' | 'compass' | 'calendar' | 'kaaba' | 'grid' | 'chart' | 'minus' | 'star';
 
 type Props = { name: IconName; size?: number; color?: ColorValue; strokeWidth?: number };
 
@@ -35,6 +35,13 @@ export function Icon({ name, size = 22, color = '#1F2A24', strokeWidth = 2 }: Pr
       {name === 'share' && (<><Path d="M4 12v8h16v-8" {...p} /><Path d="M12 3v13" {...p} /><Path d="M7 8l5-5 5 5" {...p} /></>)}
       {name === 'lock' && (<><Rect x={5} y={11} width={14} height={10} rx={2} {...p} /><Path d="M8 11V7a4 4 0 0 1 8 0v4" {...p} /></>)}
       {name === 'refresh' && (<><Path d="M21 12a9 9 0 1 1-3-6.7L21 8" {...p} /><Path d="M21 3v5h-5" {...p} /></>)}
+      {name === 'compass' && (<><Circle cx={12} cy={12} r={9} {...p} /><Path d="M15.5 8.5l-2 5-5 2 2-5z" {...p} /></>)}
+      {name === 'calendar' && (<><Rect x={3} y={5} width={18} height={16} rx={2} {...p} /><Path d="M3 10h18M8 3v4M16 3v4" {...p} /></>)}
+      {name === 'kaaba' && (<><Path d="M4 8l8-4 8 4v10l-8 3-8-3z" {...p} /><Path d="M4 11l8 3 8-3M12 14v7" {...p} /></>)}
+      {name === 'grid' && (<><Rect x={4} y={4} width={7} height={7} rx={1.5} {...p} /><Rect x={13} y={4} width={7} height={7} rx={1.5} {...p} /><Rect x={4} y={13} width={7} height={7} rx={1.5} {...p} /><Rect x={13} y={13} width={7} height={7} rx={1.5} {...p} /></>)}
+      {name === 'chart' && <Path d="M4 20V10M10 20V4M16 20v-7M22 20H2" {...p} />}
+      {name === 'minus' && <Path d="M5 12h14" {...p} />}
+      {name === 'star' && <Path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6-5.3-3-5.3 3 1.2-6-4.5-4.1 6-.7z" {...p} />}
     </Svg>
   );
 }

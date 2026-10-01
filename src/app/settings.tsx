@@ -19,6 +19,13 @@ function Radio({ label, selected, onPress, detail }: { label: string; selected: 
   );
 }
 
+const REMINDER_ROWS = [
+  { key: 'duha', label: 'Duha prayer', detail: 'When Duha time starts, about 20 minutes after sunrise' },
+  { key: 'tahajjud', label: 'Tahajjud', detail: 'At the start of the last third of the night' },
+  { key: 'fasting', label: 'Sunnah fasts', detail: 'The evening before Mondays, Thursdays, White Days, Ashura, Arafah' },
+  { key: 'friday', label: "Jumu'ah", detail: 'Al-Kahf and salawat in the morning, the last hour before Maghrib' },
+] as const;
+
 export default function SettingsScreen() {
   const { settings, update } = useSettings();
   const [msg, setMsg] = useState<string | null>(null);
@@ -71,6 +78,19 @@ export default function SettingsScreen() {
           </View>
           <Switch value={settings.adhkarReminders} onValueChange={(v) => update({ adhkarReminders: v })} trackColor={{ true: colors.ink }} />
         </View>
+        {REMINDER_ROWS.map((r) => (
+          <View key={r.key} style={s.switchRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={s.radioLabel}>{r.label}</Text>
+              <Text style={s.detail}>{r.detail}</Text>
+            </View>
+            <Switch
+              value={settings.reminders[r.key]}
+              onValueChange={(v) => update({ reminders: { ...settings.reminders, [r.key]: v } })}
+              trackColor={{ true: colors.ink }}
+            />
+          </View>
+        ))}
         <Text style={s.detail}>Turn each prayer{"'"}s reminder on or off with the bell on the Prayer screen.</Text>
         <Button label="Refresh reminders" variant="outline" icon="refresh" onPress={refresh} />
       </Card>

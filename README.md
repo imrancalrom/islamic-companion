@@ -11,8 +11,16 @@ A React Native (Expo) app for prayer times, adhan reminders, morning and evening
 | **Duas** | Categories (sleep, travel, eating, distress, illness) and search in Arabic (with or without vowel marks), Urdu or English. |
 | **Create** | Turns any dhikr or dua into a post, story or square image in four colour themes and shares it. The text is always taken from the library, never typed in. |
 | **Settings** | Location, 11 calculation methods (Umm al-Qura by default), Standard or Hanafi Asr, adhkar reminders. |
+| **Tasbeeh** (More) | After-prayer (33·33·33 + tahlil, Muslim 597) and bedtime (33·33·34) sequences, or a free count with any phrase and target. Vibrates on each count, stronger every 33 and at the target. |
+| **Prayer tracker** (More) | Last 7 days grid, current and best streak of days with all five prayers, and a qada counter per prayer. |
+| **Qibla** (More) | Compass with the Kaaba direction calculated from your location; vibrates when you face it. |
+| **Sunnah fasts** (More) | Mondays, Thursdays, White Days, Tasu'a, Ashura, Arafah and Shawwal from the Umm al-Qura calendar, with Eid and Tashriq days excluded, and a reminder the evening before. |
+| **Jumu'ah** (More) | Friday practices with sources, a salawat counter, the last hour before Maghrib, and the full Surah Al-Kahf (Tanzil text). |
+| **Hajj & Umrah** (More) | Step-by-step Umrah and Hajj al-Tamattu' guide with the duas for each step and tawaf, sa'i and jamarat counters. |
 
-Reminders: a notification at each prayer time and adhkar reminders 20 minutes after Fajr and Asr. They are scheduled 5 days ahead and topped up every time the app opens, because iOS keeps at most 64 pending notifications.
+The Prayer screen also shows Duha, witr and last-third-of-the-night times, the next Sunnah fast, and a Friday banner. Optional reminders for Duha, Tahajjud, Sunnah fasts and Friday are in Settings.
+
+Reminders: a notification at each prayer time, adhkar reminders 20 minutes after Fajr and Asr, and the optional Sunnah, fasting and Friday reminders. They are scheduled 5 days ahead (the soonest 60 at most, because iOS keeps at most 64 pending notifications) and topped up every time the app opens.
 
 ## Run it
 
@@ -39,7 +47,7 @@ npx expo-doctor       # dependency and config check
 
 Every push to `main` builds an APK on GitHub Actions (`.github/workflows/android-apk.yml`) and attaches it to a new pre-release on the repository's **Releases** page. You can also start a build from **Actions → Android APK → Run workflow**.
 
-To install: open the release on your Android phone, download the `.apk`, open it and allow "Install unknown apps" when asked. The APK is signed with a debug key, which is fine for testing but not for Google Play; for the store, build a signed `.aab` with EAS.
+To install: open the release on your Android phone, download the `.apk`, open it and allow "Install unknown apps" when asked. The APK is built for 64-bit ARM phones (nearly every Android phone since 2017) and signed with a debug key, which is fine for testing but not for Google Play; for the store, build a signed `.aab` with EAS.
 
 ## Before publishing to the stores
 

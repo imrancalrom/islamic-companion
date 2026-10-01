@@ -1,4 +1,5 @@
-import { CalculationMethod, Coordinates, Madhab, PrayerTimes } from 'adhan';
+import { CalculationMethod, Coordinates, Madhab, PrayerTimes, Qibla, SunnahTimes } from 'adhan';
+import { formatHijri, toHijri } from './hijri';
 import type { Place, PrayerKey, Settings } from './settings';
 
 export type TimeRow = { key: PrayerKey | 'sunrise'; name: string; arabic: string; time: Date };
@@ -53,19 +54,31 @@ export function formatCountdown(ms: number) {
   return `in ${h} h ${m} min`;
 }
 
-/**
- * Hijri date using the Umm al-Qura calendar, if the phone's JS engine supports it.
- * The date can differ by a day from local moon sighting, so the app labels it as approximate.
- */
+/** Hijri date (Umm al-Qura). Can differ by a day from local moon sighting. */
 export function hijriDate(d: Date): string | null {
   try {
-    const s = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    }).format(d);
-    return /AH|\d{4}/.test(s) ? s.replace(/\s*AH$/, ' AH') : null;
+    return formatHijri(toHijri(d));
   } catch {
     return null;
   }
+}
+
+/** Direction of the Kaaba in degrees clockwise from true north. */
+export const qiblaBearing = (place: Place) => Qibla(new Coordinates(place.latitude, place.longitude));
+
+/**
+ * Times for voluntary prayers on the night that starts this evening.
+ * Duha: from about 20 minutes after sunrise until about 10 minutes before Dhuhr.
+ * Witr: after Isha until Fajr. Tahajjud: best in the last third of the night.
+ */
+export function sunnahTimes(place: Place, date: Date, settings: Pick<Settings, 'method' | 'madhab'>) {
+  const t = prayerTimes(place, date, settings);
+  const night = new SunnahTimes(t);
+  return {
+    duhaStart: new Date(t.sunrise.getTime() + 20 * 60000),
+    duhaEnd: new Date(t.dhuhr.getTime() - 10 * 60000),
+    witrStart: t.isha,
+    lastThird: night.lastThirdOfTheNight,
+    middleOfNight: night.middleOfTheNight,
+  };
 }

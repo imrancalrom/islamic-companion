@@ -44,6 +44,12 @@ export type Settings = {
   prayed: Record<string, PrayerKey[]>;
   /** Adhkar sessions finished, keyed by YYYY-MM-DD. */
   adhkarDone: Record<string, string[]>;
+  /** Optional reminders beyond the five prayers. */
+  reminders: { duha: boolean; tahajjud: boolean; fasting: boolean; friday: boolean };
+  /** Missed (qada) prayers still to make up. */
+  qada: Record<PrayerKey, number>;
+  /** Tasbeeh counted today. */
+  tasbeeh: { day: string; total: number };
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -54,6 +60,9 @@ export const DEFAULT_SETTINGS: Settings = {
   adhkarReminders: true,
   prayed: {},
   adhkarDone: {},
+  reminders: { duha: false, tahajjud: false, fasting: true, friday: true },
+  qada: { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
+  tasbeeh: { day: '', total: 0 },
 };
 
 const KEY = 'settings.v1';
@@ -73,7 +82,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     AsyncStorage.getItem(KEY)
       .then((raw) => {
-        if (raw) setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        // Merge nested objects too, so settings saved by an older version gain new keys.
+        setSettings({
+          ...DEFAULT_SETTINGS,
+          ...saved,
+          reminders: { ...DEFAULT_SETTINGS.reminders, ...saved.reminders },
+          qada: { ...DEFAULT_SETTINGS.qada, ...saved.qada },
+          notify: { ...DEFAULT_SETTINGS.notify, ...saved.notify },
+        });
       })
       .catch(() => {})
       .finally(() => setReady(true));
