@@ -1,9 +1,9 @@
-import * as Location from 'expo-location';
 import { router, Stack } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 import { Button, Card } from '../../components/ui';
+import { useCompass } from '../../lib/compass';
 import { done } from '../../lib/haptics';
 import { qiblaBearing } from '../../lib/prayer';
 import { useSettings } from '../../lib/settings';
@@ -13,55 +13,35 @@ const SIZE = 290;
 const C = SIZE / 2;
 const R = SIZE / 2 - 14;
 
+const STATUS_TEXT = {
+  starting: 'Finding direction…',
+  ok: '',
+  'no-sensor':
+    Platform.OS === 'web' ? 'The compass works in the phone app.' : 'This phone has no compass sensor. Use the angle below with a separate compass.',
+  'no-data': 'No compass reading yet. Move the phone in a figure-of-eight, away from metal.',
+} as const;
+
 /** Signed difference from heading to target in degrees, -180..180. */
 const diff = (target: number, heading: number) => ((target - heading + 540) % 360) - 180;
 
 export default function QiblaScreen() {
   const { settings } = useSettings();
-  const [heading, setHeading] = useState<number | null>(null);
-  const [accuracy, setAccuracy] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const aligned = useRef(false);
   const place = settings.place;
-
   const bearing = place ? qiblaBearing(place) : null;
+  const { heading, status, needsCalibration } = useCompass(place?.latitude ?? null, place?.longitude ?? null);
+  const aligned = useRef(false);
 
+  // One vibration when the phone comes round to face the Qibla.
   useEffect(() => {
-    let sub: Location.LocationSubscription | null = null;
-    let cancelled = false;
-    (async () => {
-      try {
-        // True north needs location permission; without it the compass uses magnetic north.
-        await Location.requestForegroundPermissionsAsync().catch(() => null);
-        const s = await Location.watchHeadingAsync(
-          (h) => {
-            const value = h.trueHeading >= 0 ? h.trueHeading : h.magHeading;
-            setHeading(value);
-            setAccuracy(h.accuracy);
-            // One vibration when the phone comes round to face the Qibla.
-            if (bearing !== null) {
-              const off = Math.abs(diff(bearing, value));
-              if (off <= 5 && !aligned.current) {
-                aligned.current = true;
-                done();
-              } else if (off > 10) {
-                aligned.current = false;
-              }
-            }
-          },
-          () => setError('The compass is not available on this device.'),
-        );
-        if (cancelled) s.remove();
-        else sub = s;
-      } catch {
-        setError('The compass is not available on this device.');
-      }
-    })();
-    return () => {
-      cancelled = true;
-      sub?.remove();
-    };
-  }, [bearing]);
+    if (heading === null || bearing === null) return;
+    const off = Math.abs(diff(bearing, heading));
+    if (off <= 5 && !aligned.current) {
+      aligned.current = true;
+      done();
+    } else if (off > 10) {
+      aligned.current = false;
+    }
+  }, [heading, bearing]);
 
   if (!place || bearing === null) {
     return (
@@ -87,7 +67,7 @@ export default function QiblaScreen() {
       <Stack.Screen options={{ title: 'Qibla' }} />
       <Text style={[s.status, facing && { color: colors.ink }]}>
         {heading === null
-          ? error ?? (Platform.OS === 'web' ? 'The compass works in the phone app.' : 'Finding direction…')
+          ? STATUS_TEXT[status]
           : facing
             ? 'You are facing the Qibla'
             : `Turn ${off! > 0 ? 'right' : 'left'} ${Math.round(Math.abs(off!))}°`}
@@ -144,7 +124,7 @@ export default function QiblaScreen() {
         </Text>
         <Text style={s.small}>
           Hold the phone flat, away from metal and magnets.
-          {accuracy !== null && accuracy < 2 ? ' The compass needs calibrating: move the phone in a figure-of-eight a few times.' : ''}
+          {needsCalibration ? ' The compass needs calibrating: move the phone in a figure-of-eight a few times.' : ''}
         </Text>
       </Card>
     </View>
