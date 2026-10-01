@@ -1,6 +1,8 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { fastsOn } from './fasting';
+import { hadithFor } from '../data/hadith';
+import { fastsOn, isRamadan } from './fasting';
+import { toHijri } from './hijri';
 import { isFriday } from './friday';
 import { formatTime, PRAYER_KEYS, PRAYER_NAMES, prayerTimes, sunnahTimes } from './prayer';
 import type { Settings } from './settings';
@@ -95,6 +97,30 @@ export function planReminders(settings: Settings, now = new Date()): Planned[] {
           body: `A Sunnah fast. Suhoor ends at Fajr, ${formatTime(next.fajr)}.`,
           url: '/more/fasting',
         });
+      }
+    }
+
+    if (settings.reminders.hadith) {
+      const at = new Date(day);
+      at.setHours(9, 0, 0, 0);
+      const h = hadithFor(day);
+      out.push({ at, title: 'Hadith of the day', body: `${h.english} (${h.source})`, url: '/more/hadith' });
+    }
+
+    if (settings.bedtime) {
+      const [hh, mm] = settings.bedtime.split(':').map(Number);
+      const at = new Date(day);
+      at.setHours(hh, mm, 0, 0);
+      out.push({ at, title: 'Before sleeping', body: 'Ayat al-Kursi, the last two verses of Al-Baqarah, and the bedtime tasbih.', url: '/dhikr/night' });
+    }
+
+    if (settings.reminders.ramadan && isRamadan(day)) {
+      out.push({ at: new Date(t.fajr.getTime() - 45 * 60000), title: 'Suhoor', body: `Suhoor ends at Fajr, ${formatTime(t.fajr)}.`, url: '/more/ramadan' });
+      out.push({ at: t.maghrib, title: 'Iftar', body: 'Time to break the fast. ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ', url: '/more/ramadan', sound: true });
+      // The night after the 20th, 22nd… is the 21st, 23rd… night: the odd nights of the last ten.
+      const h = toHijri(day);
+      if (h.day >= 20 && h.day % 2 === 0) {
+        out.push({ at: new Date(t.isha.getTime() + 30 * 60000), title: `Night ${h.day + 1} of Ramadan`, body: 'An odd night of the last ten. Seek Laylat al-Qadr.', url: '/more/ramadan' });
       }
     }
 

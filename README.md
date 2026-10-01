@@ -17,8 +17,14 @@ A React Native (Expo) app for prayer times, adhan reminders, morning and evening
 | **Sunnah fasts** (More) | Mondays, Thursdays, White Days, Tasu'a, Ashura, Arafah and Shawwal from the Umm al-Qura calendar, with Eid and Tashriq days excluded, and a reminder the evening before. |
 | **Jumu'ah** (More) | Friday practices with sources, a salawat counter, the last hour before Maghrib, and the full Surah Al-Kahf (Tanzil text). |
 | **Hajj & Umrah** (More) | Step-by-step Umrah and Hajj al-Tamattu' guide with the duas for each step and tawaf, sa'i and jamarat counters. |
+| **Ramadan** (More) | Suhoor and iftar times with a countdown, a 30-night Taraweeh tracker, the iftar and Laylat al-Qadr duas, and reminders for suhoor, iftar and the odd nights of the last ten. Outside Ramadan it counts down to the next one. |
+| **I'm feeling…** (More) | Duas for anxious, sad, grateful, angry, sick, regretful and afraid, drawn from the verified library. |
+| **Hadith of the day** (More) | 22 short graded hadith in rotation, an optional 9:00 reminder, and a button to make an image. |
+| **Memorise** (More) | Hide ¼, ½, ¾ or all words, tap a gap to check, and spaced reviews after 1, 2, 4, 8, 16 and 32 days. |
+| **Check a claim** (More) | Search a curated list of viral claims (including the ones from the original YouTube graphic) with a verdict, what is authentic instead, and sources. Answers are written in advance, never generated. |
+| **Zakat calculator** (More) | Cash, gold, silver, investments, stock, money owed and debts; nisab by silver (595 g) or gold (85 g) with prices entered by the user. |
 
-The Prayer screen also shows Duha, witr and last-third-of-the-night times, the next Sunnah fast, and a Friday banner. Optional reminders for Duha, Tahajjud, Sunnah fasts and Friday are in Settings.
+The Prayer screen also shows Duha, witr and last-third-of-the-night times, the next Sunnah fast, and a Friday banner. Optional reminders for Duha, Tahajjud, Sunnah fasts, Friday, the hadith of the day, Ramadan and a bedtime adhkar time are in Settings. Items a scholar has checked (`reviewed: true`) show a "Scholar reviewed" badge.
 
 Reminders: a notification at each prayer time, adhkar reminders 20 minutes after Fajr and Asr, and the optional Sunnah, fasting and Friday reminders. They are scheduled 5 days ahead (the soonest 60 at most, because iOS keeps at most 64 pending notifications) and topped up every time the app opens.
 

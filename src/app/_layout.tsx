@@ -20,7 +20,7 @@ import { colors, fonts } from '../theme';
 /** Keeps the rolling window of prayer notifications topped up. */
 function NotificationScheduler() {
   const { settings, ready } = useSettings();
-  const { place, method, madhab, notify, adhkarReminders, reminders } = settings;
+  const { place, method, madhab, notify, adhkarReminders, reminders, bedtime } = settings;
 
   useEffect(() => {
     if (!ready) return;
@@ -31,7 +31,7 @@ function NotificationScheduler() {
     return () => sub.remove();
     // Only the fields that change the schedule.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, place, method, madhab, notify, adhkarReminders, reminders]);
+  }, [ready, place, method, madhab, notify, adhkarReminders, reminders, bedtime]);
 
   // Open the right screen when a reminder is tapped.
   useEffect(() => {

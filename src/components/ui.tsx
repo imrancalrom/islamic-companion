@@ -42,6 +42,12 @@ export function SourceLine({ entry }: { entry: Pick<Entry, 'source' | 'grade' | 
         {entry.script === 'quran' ? ' · Arabic text: Tanzil.net' : ''}
         {!entry.reviewed ? (entry.script === 'quran' ? ' · translation pending review' : ' · pending scholar review') : ''}
       </Text>
+      {entry.reviewed ? (
+        <View style={s.reviewed}>
+          <Icon name="check" size={11} color={colors.onInk} strokeWidth={3} />
+          <Text style={s.reviewedText}>Scholar reviewed</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -94,7 +100,9 @@ const s = StyleSheet.create({
   translit: { fontFamily: fonts.regular, fontStyle: 'italic', fontSize: 15, textAlign: 'center', color: colors.textMuted },
   english: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, textAlign: 'center', color: colors.text },
   virtue: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 19, color: '#3D4A43', backgroundColor: colors.surfaceWarm, borderRadius: 14, padding: 12 },
-  sourceRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  sourceRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
+  reviewed: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.ink, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  reviewedText: { fontFamily: fonts.semibold, fontSize: 11, color: colors.onInk },
   source: { fontFamily: fonts.medium, fontSize: 12, color: colors.textMuted, flexShrink: 1 },
   button: { height: 50, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 20 },
   buttonPrimary: { backgroundColor: colors.ink },

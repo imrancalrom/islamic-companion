@@ -45,7 +45,15 @@ export type Settings = {
   /** Adhkar sessions finished, keyed by YYYY-MM-DD. */
   adhkarDone: Record<string, string[]>;
   /** Optional reminders beyond the five prayers. */
-  reminders: { duha: boolean; tahajjud: boolean; fasting: boolean; friday: boolean };
+  reminders: { duha: boolean; tahajjud: boolean; fasting: boolean; friday: boolean; hadith: boolean; ramadan: boolean };
+  /** Time for the night adhkar reminder, "HH:MM", or null for off. */
+  bedtime: string | null;
+  /** Taraweeh nights prayed, keyed by Hijri year. */
+  taraweeh: Record<string, number[]>;
+  /** Memorisation progress: Leitner box and next review day per entry. */
+  memo: Record<string, { box: number; due: string }>;
+  /** Zakat calculator inputs. */
+  zakat: Record<string, string>;
   /** Missed (qada) prayers still to make up. */
   qada: Record<PrayerKey, number>;
   /** Tasbeeh counted today. */
@@ -60,7 +68,11 @@ export const DEFAULT_SETTINGS: Settings = {
   adhkarReminders: true,
   prayed: {},
   adhkarDone: {},
-  reminders: { duha: false, tahajjud: false, fasting: true, friday: true },
+  reminders: { duha: false, tahajjud: false, fasting: true, friday: true, hadith: true, ramadan: true },
+  bedtime: null,
+  taraweeh: {},
+  memo: {},
+  zakat: {},
   qada: { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
   tasbeeh: { day: '', total: 0 },
 };
@@ -91,6 +103,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           reminders: { ...DEFAULT_SETTINGS.reminders, ...saved.reminders },
           qada: { ...DEFAULT_SETTINGS.qada, ...saved.qada },
           notify: { ...DEFAULT_SETTINGS.notify, ...saved.notify },
+          tasbeeh: { ...DEFAULT_SETTINGS.tasbeeh, ...saved.tasbeeh },
         });
       })
       .catch(() => {})

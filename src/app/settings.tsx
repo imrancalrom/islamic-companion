@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { Icon } from '../components/Icon';
-import { Button, Card, Label } from '../components/ui';
+import { Button, Card, Chip, Label } from '../components/ui';
 import { detectPlace } from '../lib/location';
 import { rescheduleAll } from '../lib/notifications';
 import { METHODS, useSettings } from '../lib/settings';
@@ -19,11 +19,23 @@ function Radio({ label, selected, onPress, detail }: { label: string; selected: 
   );
 }
 
+const BEDTIMES: { label: string; value: string | null }[] = [
+  { label: 'Off', value: null },
+  { label: '9:30 pm', value: '21:30' },
+  { label: '10 pm', value: '22:00' },
+  { label: '10:30 pm', value: '22:30' },
+  { label: '11 pm', value: '23:00' },
+  { label: '11:30 pm', value: '23:30' },
+  { label: 'Midnight', value: '00:00' },
+];
+
 const REMINDER_ROWS = [
   { key: 'duha', label: 'Duha prayer', detail: 'When Duha time starts, about 20 minutes after sunrise' },
   { key: 'tahajjud', label: 'Tahajjud', detail: 'At the start of the last third of the night' },
   { key: 'fasting', label: 'Sunnah fasts', detail: 'The evening before Mondays, Thursdays, White Days, Ashura, Arafah' },
   { key: 'friday', label: "Jumu'ah", detail: 'Al-Kahf and salawat in the morning, the last hour before Maghrib' },
+  { key: 'hadith', label: 'Hadith of the day', detail: 'Every morning at 9:00' },
+  { key: 'ramadan', label: 'Ramadan', detail: 'Suhoor, iftar and the odd nights of the last ten' },
 ] as const;
 
 export default function SettingsScreen() {
@@ -91,6 +103,14 @@ export default function SettingsScreen() {
             />
           </View>
         ))}
+        <View style={{ gap: 8, paddingVertical: 6 }}>
+          <Text style={s.radioLabel}>Bedtime adhkar reminder</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {BEDTIMES.map((b) => (
+              <Chip key={b.label} label={b.label} selected={settings.bedtime === b.value} onPress={() => update({ bedtime: b.value })} />
+            ))}
+          </View>
+        </View>
         <Text style={s.detail}>Turn each prayer{"'"}s reminder on or off with the bell on the Prayer screen.</Text>
         <Button label="Refresh reminders" variant="outline" icon="refresh" onPress={refresh} />
       </Card>

@@ -9,6 +9,8 @@ export const CATEGORIES: DuaCategory[] = [
   { id: 'eating', name: 'Eating', icon: 'food' },
   { id: 'distress', name: 'Distress & worry', icon: 'heart' },
   { id: 'illness', name: 'Illness & pain', icon: 'plus' },
+  { id: 'gratitude', name: 'Gratitude', icon: 'sun' },
+  { id: 'anger', name: 'Anger', icon: 'heart' },
 ];
 
 export const DUAS: Dua[] = [
@@ -147,6 +149,37 @@ export const DUAS: Dua[] = [
     reviewed: false,
   },
 ];
+
+DUAS.push(
+  {
+    id: 'gratitude',
+    category: 'gratitude',
+    title: 'For help in remembering and thanking Allah',
+    arabic: 'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
+    transliteration: "Allahumma a'inni 'ala dhikrika wa shukrika wa husni 'ibadatik",
+    urdu: 'اے اللہ! اپنے ذکر، اپنے شکر اور اپنی اچھی عبادت پر میری مدد فرما۔',
+    english: 'O Allah, help me to remember You, to thank You, and to worship You well.',
+    count: 1,
+    virtue: 'The Prophet ﷺ advised Mu\'adh never to leave saying this at the end of every prayer.',
+    source: 'Abu Dawud 1522',
+    grade: 'Sahih',
+    reviewed: false,
+  },
+  {
+    id: 'anger',
+    category: 'anger',
+    title: 'When angry',
+    arabic: 'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ',
+    transliteration: "A'udhu billahi minash-shaytanir-rajim",
+    urdu: 'میں مردود شیطان سے اللہ کی پناہ مانگتا ہوں۔',
+    english: 'I seek refuge in Allah from Satan, the accursed.',
+    count: 1,
+    virtue: 'The Prophet ﷺ said of a man in anger: if he said this, what he feels would leave him.',
+    source: 'Sahih al-Bukhari 3282, Sahih Muslim 2610',
+    grade: 'Sahih',
+    reviewed: false,
+  },
+);
 
 export const duasIn = (category: string) => DUAS.filter((d) => d.category === category);
 export const findDua = (id: string) => DUAS.find((d) => d.id === id);

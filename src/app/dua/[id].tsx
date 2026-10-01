@@ -24,6 +24,12 @@ export default function DuaDetail() {
         </Text>
       ) : null}
       <Button
+        label="Memorise"
+        icon="refresh"
+        variant="outline"
+        onPress={() => router.push({ pathname: '/more/memorise', params: { entry: dua.id } })}
+      />
+      <Button
         label="Make an image"
         icon="image"
         variant="outline"

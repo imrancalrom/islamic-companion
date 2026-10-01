@@ -9,10 +9,25 @@ import { Icon } from '../../components/Icon';
 import { Button, Chip, Label, Title } from '../../components/ui';
 import { ADHKAR } from '../../data/adhkar';
 import { DUAS } from '../../data/duas';
+import { HADITH } from '../../data/hadith';
 import type { Entry } from '../../data/types';
 import { colors, fonts, radius } from '../../theme';
 
-const ALL: Entry[] = [...ADHKAR, ...DUAS];
+const ALL: Entry[] = [
+  ...ADHKAR,
+  ...DUAS,
+  ...HADITH.map((h): Entry => ({
+    id: `hadith-${h.id}`,
+    title: `Hadith: ${h.english.length > 48 ? h.english.slice(0, 45) + '…' : h.english}`,
+    arabic: h.arabic,
+    urdu: h.urdu,
+    english: h.english,
+    count: 1,
+    source: h.source,
+    grade: h.grade,
+    reviewed: false,
+  })),
+];
 
 const SIZES = [
   { id: 'post', label: 'Post 4:5', ratio: 5 / 4 },
